@@ -9,8 +9,6 @@ let rightPressed = false;
 let leftPressed = false;
 let score = 0;
 // Defines the angle of the balls starting pos
-class HitBox {
-}
 // Ball class
 class Ball {
     // Size of the ball and how it
@@ -30,24 +28,19 @@ class Ball {
         ctx.closePath();
     }
     update(){
-        let trash = bricks.map(trashIt => 
-            {if(trashIt.position.x == ball.ballX){
-                console.log(trashIt)
-            }
-        })
         // Changes direction of ball
         this.ballX += Math.cos(this.direction)  * this.speed
         this.ballY += Math.sin(this.direction) * this.speed
         if(this.ballX - this.radius < 0){
-            this.ballX = this.radius;
+            // this.ballX = this.radius;
             this.direction = Math.atan2(Math.sin(this.direction), -Math.cos(this.direction))
         }
         if(this.ballX + this.radius > GW){
-            this.ballX = GW - this.radius;
+            // this.ballX = GW - this.radius;
             this.direction = Math.atan2(Math.sin(this.direction), -Math.cos(this.direction))
         }
         if(this.ballY - this.radius < 0){
-            this.ballY = this.radius;
+            // this.ballY = this.radius;
             this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
         }
         // Ball & Paddle Collision
@@ -66,7 +59,6 @@ class Ball {
         }
     }
 }
-
 // Paddle class
 class Paddle {
     constructor() {
@@ -76,7 +68,6 @@ class Paddle {
             x: (GW - this.width) / 2,
             y: GH - this.height - 10
         }
-        this.leftSide = this.position.x - (this.position.x / 2)
     }
     // Drawing a paddle
     draw(ctx){
@@ -107,16 +98,13 @@ class Brick {
             y: 125 + (posY * 50)
         }
     }
-}
-// Instation
-let bricks = [];
-for (let i = 0; i < 20; i++){
-    bricks.push(new Brick(i, 0))
-    let brick = bricks[i];
-    if(brick.position.x + brick.width > GW){
-        bricks.push(new Brick((bricks.length - 1) - i, 1))
+    update(){
+        if(this.position.y == parseInt(ball.ballY)){
+            console.log('ball hit')
+        }
     }
 }
+// Instation
 let ball = new Ball()
 let paddle = new Paddle();
 // Checks input for movement
@@ -156,24 +144,9 @@ const gameLoop = () => {
     ball.draw(ctx);
     paddle.draw(ctx);
     paddle.update(leftPressed, rightPressed);
-    for(let i = 0; i < bricks.length; i++){
-        let brick = bricks[i];
-        if(brick.position.x + brick.width < GW){
-            ctx.beginPath();
-            ctx.rect(brick.position.x, brick.position.y, brick.width, brick.height)
-            ctx.fillStyle = '#4fcab0';
-            ctx.fill()
-            ctx.closePath()
-        }
-    }
     // Calls the loop again
     requestAnimationFrame(gameLoop);
 }
 // setTimeout(gameLoop, 1000 / 60)
 // Requests the loop every frame
 requestAnimationFrame(gameLoop);
-let trash = bricks.map(trashIt => 
-    {if(trashIt.position.x == ball.ballX){
-        console.log(trashIt)
-    }
-})
