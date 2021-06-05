@@ -119,7 +119,7 @@ class Paddle {
             // }
 
         }
-        this.hitbox = true;
+        this.hitbox = false;
     }
     // Drawing a paddle
     draw(ctx){
@@ -172,6 +172,7 @@ class Brick {
 }
 // Instation
 let bricks = [];
+// pushes new bricks in different spots into bricks[]
 for (let i = 0; i < 5; i++){
     let brick = new Brick(i,2)
     bricks.push(brick)
@@ -195,6 +196,7 @@ const stopMovement = (e) => {
         rightPressed = false
     }
 }
+// UI Elements
 const uiScore = () => {
     ctx.font = '18px sans-serif';
     ctx.fillText(`Score: ${score}`, 0, 15);
@@ -207,11 +209,17 @@ const uiWin = () => {
     ctx.font = '48px sans-serif';
     ctx.fillText('You won!', GW / 2, GH / 2)
 }
+// toggle hitboxes on click
+const uiDev = () => {
+    console.log('Dev mode activated!')
+    paddle.hitbox = !paddle.hitbox;
+    ball.hitbox = !ball.hitbox;
+}
 // The loop
 const gameLoop = () => {
     ctx.clearRect(0, 0, GW, GH);
-    uiScore(ctx);
-    uiSpeed(ctx);
+    uiScore();
+    uiSpeed();
     for(let i = 0; i < bricks.length; i++){
         if(!bricks[i].destroyed){
         ctx.beginPath();
@@ -232,6 +240,7 @@ const gameLoop = () => {
 // Event handlers outside of the loop to stop performance bogs
 document.addEventListener("keydown", startMovement);
 document.addEventListener("keyup", stopMovement);
+document.addEventListener("click", uiDev)
 // setTimeout(gameLoop, 1000 / 60)
 // Requests the loop every frame
 requestAnimationFrame(gameLoop);
