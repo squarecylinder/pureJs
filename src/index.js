@@ -19,7 +19,7 @@ class Ball {
         this.direction = Math.random() * Math.PI * 2;
         this.speed = Math.ceil(Math.random() * 5);
     
-        this.hitbox = true;
+        this.hitbox = false;
     }
     // How we draw a ball shape
     draw(ctx){
@@ -65,13 +65,15 @@ class Ball {
         for(let i = 0 ; i < bricks.length; i++){
             if(this.ballY > bricks[i].position.y && this.ballY < bricks[i].position.y + bricks[i].height && this.ballX > bricks[i].position.x && this.ballX < bricks[i].position.x + bricks[i].width){
                 bricks[i].break(ctx);
-                score++
-                this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
                 bricks.splice(i, 1);
+                this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
+                console.log(this.direction)
+                score++
             }
         }
         if(!bricks.length){
-            alert("THIS IS BAD PRACTICE")
+            this.speed = 0;
+            uiWin()
         }
     }
 }
@@ -122,6 +124,10 @@ class Brick {
 }
 // Instation
 let bricks = [];
+for (let i = 0; i < 5; i++){
+    let brick = new Brick(i,2)
+    bricks.push(brick)
+}
 let ball = new Ball()
 let paddle = new Paddle();
 // Checks input for movement
@@ -149,9 +155,9 @@ const uiSpeed = () => {
     ctx.font = '18px serif';
     ctx.fillText(`Speed: ${ball.speed}`, 100, 15)
 }
-for (let i = 0; i < 5; i++){
-    let brick = new Brick(i,2)
-    bricks.push(brick)
+const uiWin = () => {
+    ctx.font = '48px sans-serif';
+    ctx.fillText('You won!', GW / 2, GH / 2)
 }
 // The loop
 const gameLoop = () => {
