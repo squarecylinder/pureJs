@@ -29,7 +29,6 @@ class Ball {
         ctx.fill();
         ctx.closePath();
     }
-
     update(ctx){
         if(this.hitbox){
             ctx.strokeStyle = "blue";
@@ -53,11 +52,26 @@ class Ball {
             this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
         }
         // Ball & Paddle Collision
-        if(this.ballY == paddle.position.y || (this.ballY > GH - paddle.height - this.radius && this.ballX > paddle.position.x && this.ballX < paddle.position.x + paddle.width)){
-            // every time the ball hits the paddle, we iterate up the score
-            this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
-            // If we touch the bottom of the screen, reload page.
+        if((this.ballY > GH - paddle.height - this.radius && this.ballX > paddle.position.x && this.ballX < paddle.position.x + paddle.width)){
+            let difference = Math.floor(this.ballX) - paddle.position.x
+            let percentage = (difference / paddle.width).toFixed(2)
+            switch(true){
+                case percentage <= .45:
+                    this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
+                    console.log('left hit');
+                    break;
+                case percentage >= .65:
+                    this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
+                    console.log('right hit');
+                    break;
+                default:
+                    this.direction = Math.atan(-Math.sin(this.direction), Math.cos(this.direction))
+                    console.log('middle hit')
+                    break;
+            }
+            // this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
         }
+        // If we touch the bottom of the screen, reload page.
         else if(this.ballY + this.direction > GH){
             location.reload()
         }
@@ -67,7 +81,6 @@ class Ball {
                 bricks[i].break(ctx);
                 bricks.splice(i, 1);
                 this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
-                console.log(this.direction)
                 score++
             }
         }
@@ -78,6 +91,8 @@ class Ball {
     }
 }
 // Paddle class
+// TODO Cut the paddle in three sections. Left half, middle, and right half. Change the direction of the ball based on these sections hit.
+// If right in the middle, send the ball straight up, left side or right side, alter angle drastically, 75 degrees maybe?
 class Paddle {
     constructor() {
         this.width = 150;
@@ -86,6 +101,25 @@ class Paddle {
             x: (GW - this.width) / 2,
             y: GH - this.height - 10
         }
+        this.toCollaps = {
+            // this.leftSection = {
+            //     x: this.position.x,
+            //     y: this.position.y,
+            //     width: 65,
+            // }
+            // this.middleSection = {
+            //     x: this.position.x + 66,
+            //     y: this.position.y,
+            //     width: 20,
+            // }
+            // this.rightSection = {
+            //     x: this.position.x + 86,
+            //     y: this.position.y,
+            //     width: 65,
+            // }
+
+        }
+        this.hitbox = true;
     }
     // Drawing a paddle
     draw(ctx){
@@ -97,6 +131,20 @@ class Paddle {
     }
     // Updates left or right based on input
     update(lp, rp){
+        if(this.hitbox){
+            ctx.beginPath();
+            ctx.strokeStyle = 'black';
+            ctx.rect(this.position.x, this.position.y - 10, 0, 20);
+            ctx.stroke()
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.rect(this.position.x + 66, this.position.y, 20, this.height);
+            ctx.stroke()
+            ctx.beginPath();
+            ctx.strokeStyle = 'black';
+            ctx.rect(this.position.x + this.width, this.position.y - 10, 0, this.height);
+            ctx.stroke()
+        }
     if(rp && (this.position.x + this.width) < GW ){
         this.position.x += 10;
         rp = false
