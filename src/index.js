@@ -248,7 +248,7 @@ document.addEventListener("keyup", stopMovement);
 document.addEventListener("touchstart", touchHandler);
 document.addEventListener("touchmove", touchHandler);
 document.addEventListener("touchend", touchHandleStop);
-document.addEventListener("click", uiDev);
+// document.addEventListener("click", uiDev);
 // setTimeout(gameLoop, 1000 / 60)
 // Requests the loop every frame
 requestAnimationFrame(gameLoop);
