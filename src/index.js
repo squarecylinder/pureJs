@@ -178,10 +178,12 @@ const stopMovement = (e) => {
 }
 const touchHandler = (e) => {
     if(e.touches[0].pageX < GW / 2){
+        e.preventDefault()
         leftPressed = true;
         console.log(e.touches[0])
     }
     if(e.touches[0].pageX > GW / 2){
+        e.preventDefault()
         rightPressed = true
         console.log(e.touches[0])
     }
