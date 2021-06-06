@@ -16,7 +16,7 @@ class Ball {
         // size of the ball
         this.radius = 8;
         // angle and speed at which the ball moves once spawned
-        this.direction = Math.random() * Math.PI * 2;
+        this.direction = Math.random() * -(Math.PI);
         this.speed = Math.ceil(Math.random() * 5);
     
         this.hitbox = false;
@@ -57,11 +57,11 @@ class Ball {
             let percentage = (difference / paddle.width).toFixed(2)
             switch(true){
                 case percentage <= .45:
-                    this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
+                    this.direction = Math.atan2(-Math.sin(this.direction), -Math.cos(percentage  * (180/Math.PI)))
                     console.log('left hit');
                     break;
                 case percentage >= .65:
-                    this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
+                    this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(percentage  * (180/Math.PI)))
                     console.log('right hit');
                     break;
                 default:
@@ -91,8 +91,6 @@ class Ball {
     }
 }
 // Paddle class
-// TODO Cut the paddle in three sections. Left half, middle, and right half. Change the direction of the ball based on these sections hit.
-// If right in the middle, send the ball straight up, left side or right side, alter angle drastically, 75 degrees maybe?
 class Paddle {
     constructor() {
         this.width = 150;
@@ -100,24 +98,6 @@ class Paddle {
         this.position = {
             x: (GW - this.width) / 2,
             y: GH - this.height - 10
-        }
-        this.toCollaps = {
-            // this.leftSection = {
-            //     x: this.position.x,
-            //     y: this.position.y,
-            //     width: 65,
-            // }
-            // this.middleSection = {
-            //     x: this.position.x + 66,
-            //     y: this.position.y,
-            //     width: 20,
-            // }
-            // this.rightSection = {
-            //     x: this.position.x + 86,
-            //     y: this.position.y,
-            //     width: 65,
-            // }
-
         }
         this.hitbox = false;
     }
@@ -211,7 +191,7 @@ const uiWin = () => {
 }
 // toggle hitboxes on click
 const uiDev = () => {
-    console.log('Dev mode activated!')
+    console.log('Dev mode Changed!')
     paddle.hitbox = !paddle.hitbox;
     ball.hitbox = !ball.hitbox;
 }
