@@ -153,9 +153,17 @@ class Brick {
 // Instation
 let bricks = [];
 // pushes new bricks in different spots into bricks[]
-for (let i = 0; i < 5; i++){
-    let brick = new Brick(i,2)
+for (let i = 0; i < 18; i++){
+    let brick = new Brick(i,0)
     bricks.push(brick)
+    if(i > 5){
+        let brick = new Brick(i - 6, 1)
+        bricks.push(brick)
+    }
+    if(i > 10){
+        let brick = new Brick(i - 11, 2)
+        bricks.push(brick)
+    }
 }
 let ball = new Ball()
 let paddle = new Paddle();
