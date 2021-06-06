@@ -176,6 +176,21 @@ const stopMovement = (e) => {
         rightPressed = false
     }
 }
+const touchHandler = (e) => {
+    if(e.touches[0].pageX < GW / 2){
+        leftPressed = true;
+        console.log(e.touches[0])
+    }
+    if(e.touches[0].pageX > GW / 2){
+        rightPressed = true
+        console.log(e.touches[0])
+    }
+}
+const touchHandleStop = (e) => {
+        leftPressed = false;
+    
+        rightPressed = false
+}
 // UI Elements
 const uiScore = () => {
     ctx.font = '18px sans-serif';
@@ -220,7 +235,10 @@ const gameLoop = () => {
 // Event handlers outside of the loop to stop performance bogs
 document.addEventListener("keydown", startMovement);
 document.addEventListener("keyup", stopMovement);
-document.addEventListener("click", uiDev)
+document.addEventListener("touchstart", touchHandler);
+document.addEventListener("touchmove", touchHandler);
+document.addEventListener("touchend", touchHandleStop);
+document.addEventListener("click", uiDev);
 // setTimeout(gameLoop, 1000 / 60)
 // Requests the loop every frame
 requestAnimationFrame(gameLoop);
