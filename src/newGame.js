@@ -4,58 +4,72 @@ let ctx = canvas.getContext('2d')
 const GW = canvas.width;
 const GH = canvas.height;
 // Global variables because bad practice :)
-const builds = ['warrior', 'rogue', 'mage', 'hunter']
+// our selection arrays
+const Builds = ['Warrior', 'Rogue', 'Mage', 'Hunter']
+const colors = ['red', 'green', 'blue', 'magenta']
+
 let classPicked = false;
-let build;
+let Build;
 let player;
-let colors = ['red', 'green', 'blue', 'magenta']
 let qtrw = GW / 4;
 let qtrh = GH / 4;
-let playerInputName = "Jest";
 let classPicks = [];
 let choices = [];
+let interval;
 
 class Character {
-    constructor(name, build) {
-        this.name = name;
-        this.build = build;
+    constructor(Name, Build) {
+        this.Name = Name;
+        this.Build = Build;
     }
 }
 class Player extends Character {
-    constructor(name, build) {
-        super(name, build)
-        this.xp = 0;
-        this.level = 1;
-        this.gold = 0;
+    constructor(Name, Build) {
+        super(Name, Build)
+        this.XP = 0;
+        this.Level = 1;
+        this.Gold = 0;
     }
     assign() {
-        switch (this.build) {
-            case 'warrior':
-                this.health = 30
-                this.mana = 0;
-                this.strength = 5;
+        switch (this.Build) {
+            case 'Warrior':
+                this.Health = 30
+                this.Mana = 0;
+                this.Strength = 5;
                 break;
         }
-        switch (this.build) {
-            case 'rogue':
-                this.health = 15
-                this.mana = 1;
-                this.strength = 3;
+        switch (this.Build) {
+            case 'Rogue':
+                this.Health = 15
+                this.Mana = 1;
+                this.Strength = 3;
                 break;
         }
-        switch (this.build) {
-            case 'mage':
-                this.health = 10
-                this.mana = 5;
-                this.strength = 2;
+        switch (this.Build) {
+            case 'Mage':
+                this.Health = 10
+                this.Mana = 5;
+                this.Strength = 2;
                 break;
         }
-        switch (this.build) {
-            case 'hunter':
-                this.health = 20
-                this.mana = 2;
-                this.strength = 4;
+        switch (this.Build) {
+            case 'Hunter':
+                this.Health = 20
+                this.Mana = 2;
+                this.Strength = 4;
                 break;
+        }
+    }
+    alive() {
+        if (this.Health <= 0){
+            ctx.fillStyle = 'black';
+            ctx.clearRect(0,0, 1000, 1000)
+            ctx.rect(0, 0, GW, GH);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = '50px serif';
+            ctx.fillText('You have died...', GW / 2 - 150, GH / 2, 300)
+            clearInterval(interval)
         }
     }
 }
@@ -69,7 +83,7 @@ const uiClassChoice = () => {
     for (let i = 0; i < 4; i++) {
         let box = new Path2D();
         // adding a construcotr so we can identify our Path2D object
-        box.constructor = builds[i]
+        box.constructor = Builds[i]
         // each block and text pair are different colors
         ctx.fillStyle = colors[i];
         // drawing the box a little off from the wall and then qtr from the width times iterator
@@ -78,8 +92,9 @@ const uiClassChoice = () => {
         ctx.fill(box);
         // adds our box obj to an array to call from later
         classPicks.push(box)
+        // font over our boxes
         ctx.font = '18px sans-serif';
-        ctx.fillText(`${builds[i]}`, 100 + (qtrw * i), qtrh - 10)
+        ctx.fillText(`${Builds[i]}`, 100 + (qtrw * i), qtrh - 10)
     }
 }
 // Checks to see if user clicks on a class block
@@ -88,37 +103,33 @@ const classPicker = (e) => {
         if (ctx.isPointInPath(classPicks[i], e.offsetX, e.offsetY)) {
             if (!classPicked) {
                 switch (classPicks[i].constructor) {
-                    case 'warrior':
+                    case 'Warrior':
                         classPicked = true
-                        build = 'warrior'
-                        player = new Player(playerInputName, build)
-                        ctx.clearRect(0, 0, GW, GH)
+                        Build = 'Warrior'
+                        player = new Player(playerInputName(), Build)
                         player.assign();
-                        gameLoop();
+                        interval = setInterval(gameLoop, 100);
                         break;
-                    case 'rogue':
+                    case 'Rogue':
                         classPicked = true
-                        build = 'rogue'
-                        player = new Player(playerInputName, build)
-                        ctx.clearRect(0, 0, GW, GH)
+                        Build = 'Rogue'
+                        player = new Player(playerInputName(), Build)
                         player.assign();
-                        gameLoop();
+                        interval = setInterval(gameLoop, 100);
                         break;
-                    case 'mage':
+                    case 'Mage':
                         classPicked = true
-                        build = 'mage'
-                        player = new Player(playerInputName, build)
-                        ctx.clearRect(0, 0, GW, GH)
+                        Build = 'Mage'
+                        player = new Player(playerInputName(), Build)
                         player.assign();
-                        gameLoop();
+                        interval = setInterval(gameLoop, 100);
                         break;
-                    case 'hunter':
+                    case 'Hunter':
                         classPicked = true
-                        build = 'hunter'
-                        player = new Player(playerInputName, build)
-                        ctx.clearRect(0, 0, GW, GH)
+                        Build = 'Hunter'
+                        player = new Player(playerInputName(), Build)
                         player.assign();
-                        gameLoop();
+                        interval = setInterval(gameLoop, 100);
                         break;
                     default: console.log('no box')
                 }
@@ -126,7 +137,7 @@ const classPicker = (e) => {
         }
     }
 }
-const choiceArea = (e) => {
+const choiceArea = () => {
     // ctx.fillStyle ='#58E8A2'
     ctx.fillStyle = '#A89E60'
     ctx.rect(0, 0, GW, GH)
@@ -145,24 +156,27 @@ const uiStats = () => {
             const element = player[keys];
             ctx.fillStyle = 'black';
             ctx.font = '20px sans-serif';
-            ctx.fillText(`${keys.toUpperCase()}: ${element}`, 775, qtrh - 100 + (50 * i))
+            ctx.fillText(`${keys}: ${element}`, 775, qtrh - 100 + (50 * i))
         }
         i++
     }
-
-    // for(let i = 0; i < 8; i++){
-    //     ctx.font = '18px sans-serif';
-    //     ctx.fillText = `${Player.}`
-    // }
-    
+}
+const playerInputName = () => {
+    let inputName = prompt('Enter your name');
+    if(inputName.length <= 0 || inputName.length >= 15){
+        alert('Enter a name greater than 0 but less than 15 characters!')
+        playerInputName()
+    }
+    inputName = (inputName.charAt(0).toUpperCase() + inputName.slice(1))
+    return inputName
 }
 canvas.addEventListener("click", classPicker)
 uiClassChoice()
 // The game starts after our initial user input. hopefully.
 const gameLoop = () => {
+    ctx.clearRect(0, 0, GW, GH)
     choiceArea()
     playArea()
     uiStats()
-    // console.log(player);
-    requestAnimationFrame(gameLoop);
+    player.alive()
 }
