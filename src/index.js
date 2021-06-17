@@ -3,6 +3,7 @@ let ctx = document.getElementById("gameScreen").getContext('2d')
 const GW = 960;
 const GH = 540;
 // state of key press
+const index= 15;
 let rightPressed = false;
 let leftPressed = false;
 let score = 0;

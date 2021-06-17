@@ -4,11 +4,10 @@ let ctx = canvas.getContext('2d')
 const GW = canvas.width;
 const GH = canvas.height;
 // Global variables because bad practice :)
-
+let inputName;
 let classPicked = false;
 let eventTriggered = false;
 let eventType;
-let Build;
 let player;
 let qtrw = GW / 4;
 let qtrh = GH / 4;
@@ -16,7 +15,23 @@ let classPicks = [];
 let choices = [];
 let proceed = [];
 let interval;
-
+// our game actions module
+const game = () =>{
+    return {
+        getRandom: (arr) => {
+            let randomIndex = Math.floor(Math.random() * arr.length);
+            return arr[randomIndex];
+        },
+        getPlayer: (Build) => {
+            player = new Player(playerInputName(), Build)
+            player.assign();
+            interval = setInterval(gameLoop, 100);
+            inputBoxes()
+        }
+    }
+}
+// saving our module as a variable
+const gameActions = game()
 class Character {
     constructor(Name, Build) {
         this.Name = Name;
@@ -83,10 +98,10 @@ const uiClassChoice = () => {
     ctx.font = '56px sans-serif';
     ctx.fillText('Pick a class', GW / 3, GH / 6, 1000)
     // creating 4 blocks
-    for (let i = 0; i < 4; i++) {
+    const createBlocks = (i) => {
         let box = new Path2D();
         // adding a construcotr so we can identify our Path2D object
-        box.constructor = Builds[i]
+        box.build = Builds[i]
         // each block and text pair are different colors
         ctx.fillStyle = colors[i];
         // drawing the box a little off from the wall and then qtr from the width times iterator
@@ -97,7 +112,58 @@ const uiClassChoice = () => {
         classPicks.push(box)
         // font over our boxes
         ctx.font = '18px sans-serif';
-        ctx.fillText(`${Builds[i]}`, 100 + (qtrw * i), qtrh - 10)
+        ctx.fillText(`${Builds[i]}`, 100 + (qtrw * i), qtrh - 10)}
+    for (let i = 0; i < 4; i++) {
+        createBlocks(i)
+    }
+}
+// Create an object with methods that creates a new instance of the player class.
+const assignBuild = { 
+    Warrior: () => {
+        classPicked = true
+        gameActions.getPlayer('Warrior')
+    },
+    Rogue: () => {
+        classPicked = true
+        gameActions.getPlayer('Rogue')
+    },
+    Mage: () => {
+        classPicked = true
+        gameActions.getPlayer('Mage')
+    },
+    Hunter: () => {
+        classPicked = true
+        gameActions.getPlayer('Hunter')
+    }
+}
+const assignEvents = {
+    Explore: () => {
+        eventTriggered = true
+        eventType = 'Explore'
+        clearInterval(interval)
+        yesNo();
+        ctx.fillText('You find a tunnel. Do you want to look inside?', 10, 30);
+    },
+    Talk: () => {
+        eventTriggered = true
+        eventType = 'Talk'
+        clearInterval(interval)
+        yesNo();
+        ctx.fillText('Hey you there! Want to talk?', 10, 30);
+    },
+    Fight: () => {
+        eventTriggered = true
+        eventType = 'Fight'
+        clearInterval(interval)
+        yesNo();
+        ctx.fillText('Someone mean mugged you, fight?', 10, 30);
+    },
+    Rest: () => {
+        eventTriggered = true
+        eventType = 'Rest'
+        clearInterval(interval)
+        yesNo();
+        ctx.fillText('Thats a nice hay bed there... Sleep?', 10, 30);
     }
 }
 // Checks to see if where user clicks on input boxes
@@ -105,77 +171,16 @@ const clickHandler = (e) => {
     for (let i = 0; i < classPicks.length; i++) {
         if (ctx.isPointInPath(classPicks[i], e.offsetX, e.offsetY)) {
             if (!classPicked) {
-                switch (classPicks[i].constructor) {
-                    case 'Warrior':
-                        classPicked = true
-                        Build = 'Warrior'
-                        player = new Player(playerInputName(), Build)
-                        player.assign();
-                        interval = setInterval(gameLoop, 100);
-                        inputBoxes()
-                        break;
-                    case 'Rogue':
-                        classPicked = true
-                        Build = 'Rogue'
-                        player = new Player(playerInputName(), Build)
-                        player.assign();
-                        interval = setInterval(gameLoop, 100);
-                        inputBoxes()
-                        break;
-                    case 'Mage':
-                        classPicked = true
-                        Build = 'Mage'
-                        player = new Player(playerInputName(), Build)
-                        player.assign();
-                        interval = setInterval(gameLoop, 100);
-                        inputBoxes()
-                        break;
-                    case 'Hunter':
-                        classPicked = true
-                        Build = 'Hunter'
-                        player = new Player(playerInputName(), Build)
-                        player.assign();
-                        interval = setInterval(gameLoop, 100);
-                        inputBoxes()
-                        break;
-                    default: console.log('no box')
+                // if classes aren't picked yet, we go to assign build object.
+                assignBuild[classPicks[i].build]();
                 }
             }
         }
-    }
     for (let i = 0; i < choices.length; i++) {
         if(ctx.isPointInPath(choices[i], e.offsetX, e.offsetY)){
             if(!eventTriggered){
-                switch (choices[i].constructor){
-                    case 'Explore':
-                        eventTriggered = true
-                        eventType = 'Explore'
-                        clearInterval(interval)
-                        yesNo();
-                        ctx.fillText('You find a tunnel. Do you want to look inside?', 10, 30);
-                        break;
-                    case 'Talk':
-                        eventTriggered = true
-                        eventType = 'Talk'
-                        clearInterval(interval)
-                        yesNo();
-                        ctx.fillText('Hey you there! Want to talk?', 10, 30);
-                        break;
-                    case 'Fight':
-                        eventTriggered = true
-                        eventType = 'Fight'
-                        clearInterval(interval)
-                        yesNo();
-                        ctx.fillText('Someone mean mugged you, fight?', 10, 30);
-                        break;
-                    case 'Rest':
-                        eventTriggered = true
-                        eventType = 'Rest'
-                        clearInterval(interval)
-                        yesNo();
-                        ctx.fillText('Thats a nice hay bed there... Sleep?', 10, 30);
-                        break;
-                }
+                // If an event wasn't triggered fire
+                assignEvents[choices[i].Choice]()
             }
         }
     }
@@ -184,7 +189,7 @@ const clickHandler = (e) => {
             switch(eventType){
                 case 'Explore':
                     if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = getRandom(exploreEvents)
+                        let eventsDialog = gameActions.getRandom(exploreEvents)
                         proceed = [];
                         playArea();
                         uiStats();
@@ -209,7 +214,7 @@ const clickHandler = (e) => {
                     break;
                 case 'Talk':
                     if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = getRandom(talkEvents)
+                        let eventsDialog = gameActions.getRandom(talkEvents)
                         proceed = [];
                         playArea();
                         uiStats();
@@ -234,7 +239,7 @@ const clickHandler = (e) => {
                     break;
                 case 'Fight':
                     if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = getRandom(fightEvents)
+                        let eventsDialog = gameActions.getRandom(fightEvents)
                         proceed = [];
                         playArea();
                         uiStats();
@@ -259,7 +264,7 @@ const clickHandler = (e) => {
                     break;
                 case 'Rest':
                     if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = getRandom(restEvents)
+                        let eventsDialog = gameActions.getRandom(restEvents)
                         proceed = [];
                         playArea();
                         uiStats();
@@ -282,13 +287,10 @@ const clickHandler = (e) => {
                         }, 100);
                     }
                     break;
+                default: console.log('No button pressed');
             }
         }
     }
-}
-const getRandom = (arr) => {
-    let randomIndex = Math.floor(Math.random() * arr.length);
-    return arr[randomIndex];
 }
 const exploreEvents = [
     {
@@ -360,11 +362,12 @@ const restEvents = [
         Strength: 0,
         XP: 0,
         Text: `You took a nice rest.`
-    }]
+    }
+]
 const yesNo = () => {
     const yesorNo = ['Yes', 'No'];
     for(let i = 0; i < 2; i++){
-        let button = new Path2D();;
+        let button = new Path2D();
         ctx.fillStyle = 'gray';
         button.constructor = yesorNo[i];
         button.rect(150 + (qtrw * i), GH - 300, 200, 50);
@@ -383,7 +386,7 @@ const inputBoxes = () => {
     ctx.fill()
         for(let i = 0; i < 4; i++){
         let button = new Path2D();
-        button.constructor = Choices[i];
+        button.Choice = Choices[i];
         button.rect(50 + (qtrw * i), GH - 150 , 125, 100);
         choices.push(button)
         }
@@ -401,7 +404,7 @@ const playArea = () => {
         ctx.fill(choices[i]);
         ctx.fillStyle = 'black';
         ctx.font = '28px sans-serif'
-        ctx.fillText(`${choices[i].constructor}`, 60 + (qtrw * i), GH - 100)
+        ctx.fillText(`${choices[i].Choice}`, 60 + (qtrw * i), GH - 100)
     }
 }
 const uiStats = () => {
@@ -417,7 +420,7 @@ const uiStats = () => {
     }
 }
 const playerInputName = () => {
-    let inputName = prompt('Enter your name');
+    inputName = prompt('Enter your name').trim();
     if(inputName.length <= 0 || inputName.length >= 15){
         alert('Enter a name greater than 0 but less than 15 characters!')
         playerInputName()
@@ -434,3 +437,4 @@ const gameLoop = () => {
     uiStats()
     player.alive()
 }
+// function to create types of events params to determine the range
