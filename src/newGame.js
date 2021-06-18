@@ -4,7 +4,6 @@ let ctx = canvas.getContext('2d')
 const GW = canvas.width;
 const GH = canvas.height;
 // Global variables because bad practice :)
-let inputName;
 let classPicked = false;
 let eventTriggered = false;
 let eventType;
@@ -23,27 +22,12 @@ const game = () =>{
             return arr[randomIndex];
         },
         getPlayer: (Build) => {
-            player = new Player(playerInputName(), Build)
+            player = new Player(playerInputName(), Build);
             player[Build]();
-            interval = setInterval(gameLoop, 100);
-            inputBoxes()
-        },
-        getEvents: () => {
-            let eventsDialog = getRandom(fightEvents)
-            proceed = [];
+            inputBoxes();
             playArea();
             uiStats();
-            ctx.fillText(eventsDialog.Text ,10, 30)
-            player.Gold += eventsDialog.Gold;
-            player.Health += eventsDialog.Health;
-            player.Mana += eventsDialog.Mana;
-            player.Strength += eventsDialog.Strength;
-            player.XP += eventsDialog.XP;
-            setTimeout(() =>{
-            eventTriggered = false;
-            interval = setInterval(gameLoop, 100);
-            }, 3000);
-        }
+        },
     }
 }
 // saving our module as a variable
@@ -182,14 +166,14 @@ const assignDecision = {
         player.XP += eventsDialog.XP;
         setTimeout(() =>{
         eventTriggered = false;
-        interval = setInterval(gameLoop, 100);
+        playArea();
+        uiStats();
         }, 3000);
     },
     No: () => {
         proceed = [];
         setTimeout(() =>{
         eventTriggered = false;
-        interval = setInterval(gameLoop, 100);
         }, 100);}
 }
 // Checks to see if where user clicks on input boxes
@@ -326,6 +310,7 @@ const playArea = () => {
         ctx.font = '28px sans-serif'
         ctx.fillText(`${choices[i].choice}`, 60 + (qtrw * i), GH - 100)
     }
+    player.alive()
 }
 const uiStats = () => {
     let i = 0;
@@ -350,10 +335,3 @@ const playerInputName = () => {
 }
 canvas.addEventListener("click", clickHandler)
 uiClassChoice()
-// The game starts after our initial user input. hopefully.
-const gameLoop = () => {
-    playArea()
-    uiStats()
-    player.alive()
-}
-// function to create types of events params to determine the range
