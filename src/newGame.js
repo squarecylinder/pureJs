@@ -24,9 +24,25 @@ const game = () =>{
         },
         getPlayer: (Build) => {
             player = new Player(playerInputName(), Build)
-            player.assign();
+            player[Build]();
             interval = setInterval(gameLoop, 100);
             inputBoxes()
+        },
+        getEvents: () => {
+            let eventsDialog = getRandom(fightEvents)
+            proceed = [];
+            playArea();
+            uiStats();
+            ctx.fillText(eventsDialog.Text ,10, 30)
+            player.Gold += eventsDialog.Gold;
+            player.Health += eventsDialog.Health;
+            player.Mana += eventsDialog.Mana;
+            player.Strength += eventsDialog.Strength;
+            player.XP += eventsDialog.XP;
+            setTimeout(() =>{
+            eventTriggered = false;
+            interval = setInterval(gameLoop, 100);
+            }, 3000);
         }
     }
 }
@@ -45,35 +61,25 @@ class Player extends Character {
         this.Level = 1;
         this.Gold = 0;
     }
-    assign() {
-        switch (this.Build) {
-            case 'Warrior':
-                this.Health = 30
-                this.Mana = 0;
-                this.Strength = 5;
-                break;
-        }
-        switch (this.Build) {
-            case 'Rogue':
-                this.Health = 15
-                this.Mana = 1;
-                this.Strength = 3;
-                break;
-        }
-        switch (this.Build) {
-            case 'Mage':
-                this.Health = 10
-                this.Mana = 5;
-                this.Strength = 2;
-                break;
-        }
-        switch (this.Build) {
-            case 'Hunter':
-                this.Health = 20
-                this.Mana = 2;
-                this.Strength = 4;
-                break;
-        }
+    Warrior() {
+        this.Health = 30;
+        this.Mana = 0;
+        this.Strength = 5;
+    }
+    Rogue(){
+        this.Health = 15;
+        this.Mana = 1;
+        this.Strength = 3;
+    }
+    Mage(){
+        this.Health = 10;
+        this.Mana = 5;
+        this.Strength = 2;
+    }
+    Hunter(){
+        this.Health = 20
+        this.Mana = 2;
+        this.Strength = 4;
     }
     alive() {
         if (this.Health <= 0){
@@ -141,30 +147,50 @@ const assignEvents = {
         eventTriggered = true
         eventType = 'Explore'
         clearInterval(interval)
-        yesNo();
         ctx.fillText('You find a tunnel. Do you want to look inside?', 10, 30);
     },
     Talk: () => {
         eventTriggered = true
         eventType = 'Talk'
         clearInterval(interval)
-        yesNo();
         ctx.fillText('Hey you there! Want to talk?', 10, 30);
     },
     Fight: () => {
         eventTriggered = true
         eventType = 'Fight'
         clearInterval(interval)
-        yesNo();
         ctx.fillText('Someone mean mugged you, fight?', 10, 30);
     },
     Rest: () => {
         eventTriggered = true
         eventType = 'Rest'
         clearInterval(interval)
-        yesNo();
         ctx.fillText('Thats a nice hay bed there... Sleep?', 10, 30);
     }
+}
+const assignDecision = {
+    Yes: () => {
+        let eventsDialog = gameActions.getRandom(Events[eventType])
+        proceed = [];
+        playArea();
+        uiStats();
+        ctx.fillText(eventsDialog.Text ,10, 30)
+        player.Gold += eventsDialog.Gold;
+        player.Health += eventsDialog.Health;
+        player.Mana += eventsDialog.Mana;
+        player.Strength += eventsDialog.Strength;
+        player.XP += eventsDialog.XP;
+        setTimeout(() =>{
+        eventTriggered = false;
+        interval = setInterval(gameLoop, 100);
+        }, 3000);
+    },
+    No: () => {
+        proceed = [];
+        setTimeout(() =>{
+        eventTriggered = false;
+        interval = setInterval(gameLoop, 100);
+        }, 100);}
 }
 // Checks to see if where user clicks on input boxes
 const clickHandler = (e) => {
@@ -180,120 +206,20 @@ const clickHandler = (e) => {
         if(ctx.isPointInPath(choices[i], e.offsetX, e.offsetY)){
             if(!eventTriggered){
                 // If an event wasn't triggered fire
-                assignEvents[choices[i].Choice]()
+                assignEvents[choices[i].choice]()
+                yesNo();
             }
         }
     }
     for (let i = 0; i < proceed.length; i++){
         if(ctx.isPointInPath(proceed[i], e.offsetX, e.offsetY)){
-            switch(eventType){
-                case 'Explore':
-                    if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = gameActions.getRandom(exploreEvents)
-                        proceed = [];
-                        playArea();
-                        uiStats();
-                        ctx.fillText(eventsDialog.Text ,10, 30)
-                        player.Gold += eventsDialog.Gold;
-                        player.Health += eventsDialog.Health;
-                        player.Mana += eventsDialog.Mana;
-                        player.Strength += eventsDialog.Strength;
-                        player.XP += eventsDialog.XP;
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 3000);
-                    }
-                    else{ 
-                        proceed = [];
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 100);
-                    }
-                    break;
-                case 'Talk':
-                    if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = gameActions.getRandom(talkEvents)
-                        proceed = [];
-                        playArea();
-                        uiStats();
-                        ctx.fillText(eventsDialog.Text ,10, 30)
-                        player.Gold += eventsDialog.Gold;
-                        player.Health += eventsDialog.Health;
-                        player.Mana += eventsDialog.Mana;
-                        player.Strength += eventsDialog.Strength;
-                        player.XP += eventsDialog.XP;
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 3000);
-                    }
-                    else{ 
-                        proceed = [];
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 100);
-                    }
-                    break;
-                case 'Fight':
-                    if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = gameActions.getRandom(fightEvents)
-                        proceed = [];
-                        playArea();
-                        uiStats();
-                        ctx.fillText(eventsDialog.Text ,10, 30)
-                        player.Gold += eventsDialog.Gold;
-                        player.Health += eventsDialog.Health;
-                        player.Mana += eventsDialog.Mana;
-                        player.Strength += eventsDialog.Strength;
-                        player.XP += eventsDialog.XP;
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 3000);
-                    }
-                    else{ 
-                        proceed = [];
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 100);
-                    }
-                    break;
-                case 'Rest':
-                    if(proceed[i].constructor == 'Yes'){
-                        let eventsDialog = gameActions.getRandom(restEvents)
-                        proceed = [];
-                        playArea();
-                        uiStats();
-                        ctx.fillText(eventsDialog.Text ,10, 30)
-                        player.Gold += eventsDialog.Gold;
-                        player.Health += eventsDialog.Health;
-                        player.Mana += eventsDialog.Mana;
-                        player.Strength += eventsDialog.Strength;
-                        player.XP += eventsDialog.XP;
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 3000);
-                    }
-                    else{ 
-                        proceed = [];
-                        setTimeout(() =>{
-                        eventTriggered = false;
-                        interval = setInterval(gameLoop, 100);
-                        }, 100);
-                    }
-                    break;
-                default: console.log('No button pressed');
-            }
+            assignDecision[proceed[i].decision]()
         }
     }
 }
-const exploreEvents = [
-    {
+// Add all of the events in an object with objects with arrays woooh, that was a long one
+const Events = {
+    Explore: [{
         Gold: 10,
         Health: -1,
         Mana: 0,
@@ -316,10 +242,8 @@ const exploreEvents = [
         Strength: 0,
         XP: 0,
         Text: `You weren't paying attention, robbers make quick work of your pockets!`
-    },
-]
-const talkEvents = [
-    {
+    }],
+    Talk: [{
         Gold: 0,
         Health: 0,
         Mana: 0,
@@ -342,34 +266,30 @@ const talkEvents = [
         Strength: -1,
         XP: -1,
         Text: `You never talked to someone so stupid before... All stats decreased by 1!`
-    },
-]
-const fightEvents = [
-    {
+    }],
+    Fight: [{
         Gold: 0,
         Health: -100,
         Mana: 0,
         Strength: 0,
         XP: 0,
         Text: `WE HAVEN'T TAUGHT YOU TO FIGHT?!`
-    }
-]
-const restEvents = [
-    {
+    }],
+    Rest: [{
         Gold: 0,
         Health: 5,
         Mana: 0,
         Strength: 0,
         XP: 0,
         Text: `You took a nice rest.`
-    }
-]
+    }]
+}
 const yesNo = () => {
     const yesorNo = ['Yes', 'No'];
     for(let i = 0; i < 2; i++){
         let button = new Path2D();
         ctx.fillStyle = 'gray';
-        button.constructor = yesorNo[i];
+        button.decision = yesorNo[i];
         button.rect(150 + (qtrw * i), GH - 300, 200, 50);
         proceed.push(button);
         ctx.fill(button);
@@ -386,7 +306,7 @@ const inputBoxes = () => {
     ctx.fill()
         for(let i = 0; i < 4; i++){
         let button = new Path2D();
-        button.Choice = Choices[i];
+        button.choice = Choices[i];
         button.rect(50 + (qtrw * i), GH - 150 , 125, 100);
         choices.push(button)
         }
@@ -404,7 +324,7 @@ const playArea = () => {
         ctx.fill(choices[i]);
         ctx.fillStyle = 'black';
         ctx.font = '28px sans-serif'
-        ctx.fillText(`${choices[i].Choice}`, 60 + (qtrw * i), GH - 100)
+        ctx.fillText(`${choices[i].choice}`, 60 + (qtrw * i), GH - 100)
     }
 }
 const uiStats = () => {
@@ -432,7 +352,6 @@ canvas.addEventListener("click", clickHandler)
 uiClassChoice()
 // The game starts after our initial user input. hopefully.
 const gameLoop = () => {
-    ctx.clearRect(0, 0, GW, GH)
     playArea()
     uiStats()
     player.alive()
