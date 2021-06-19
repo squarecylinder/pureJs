@@ -28,6 +28,11 @@ const game = () =>{
             playArea();
             uiStats();
         },
+        getEnemy: (type) => {
+            enemy = new Enemy(type);
+            enemy[type]();
+            
+        }
     }
 }
 // saving our module as a variable
@@ -49,23 +54,27 @@ class Player extends Character {
         this.Health = 30;
         this.Mana = 0;
         this.Strength = 5;
+        this.Agility = 2;
     }
     Rogue(){
         this.Health = 15;
         this.Mana = 1;
         this.Strength = 3;
+        this.Agility = 5;
     }
     Mage(){
         this.Health = 10;
         this.Mana = 5;
         this.Strength = 2;
+        this.Agility = 3;
     }
     Hunter(){
         this.Health = 20
         this.Mana = 2;
         this.Strength = 4;
+        this.Agility = 4;
     }
-    alive() {
+    status() {
         if (this.Health <= 0){
             ctx.fillStyle = 'black';
             ctx.clearRect(0,0, 1000, 1000)
@@ -76,6 +85,31 @@ class Player extends Character {
             ctx.fillText('You have died...', GW / 2 - 150, GH / 2, 300)
             clearInterval(interval)
         }
+        if (this.XP >= 100){
+            this.Health++;
+            this.Level++;
+            this.Mana++;
+            this.Strength++;
+            this.XP = 0;
+        }
+    }
+}
+class Enemy extends Character {
+    constructor(Name, Build) {
+        super(Name, Build)
+        this.Level = player.Level + (Math.floor(Math.random() * Player.Level));
+    }
+    Goblin(){
+        this.Strength = 2;
+        this.Mana = 0;
+        this.Health = 3;
+        this.Agility = 4;
+    }
+    Orc(){
+
+    }
+    Bandit(){
+
     }
 }
 // Creates 4 boxes each representing a class
@@ -164,6 +198,9 @@ const assignDecision = {
         player.Mana += eventsDialog.Mana;
         player.Strength += eventsDialog.Strength;
         player.XP += eventsDialog.XP;
+        if(player.Gold <= 0){
+            player.Gold = 0;
+        }
         setTimeout(() =>{
         eventTriggered = false;
         playArea();
@@ -202,7 +239,7 @@ const clickHandler = (e) => {
     }
 }
 // Add all of the events in an object with objects with arrays woooh, that was a long one
-const Events = {
+const Events = {    
     Explore: [{
         Gold: 10,
         Health: -1,
@@ -221,7 +258,7 @@ const Events = {
     },
     {
         Gold: -10,
-        Health: -5,
+        Health: -1,
         Mana: 0,
         Strength: 0,
         XP: 0,
@@ -310,7 +347,7 @@ const playArea = () => {
         ctx.font = '28px sans-serif'
         ctx.fillText(`${choices[i].choice}`, 60 + (qtrw * i), GH - 100)
     }
-    player.alive()
+    player.status()
 }
 const uiStats = () => {
     let i = 0;
