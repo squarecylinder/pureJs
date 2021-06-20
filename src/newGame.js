@@ -43,12 +43,15 @@ const game = () =>{
             if(player.Health <= 0) {
                 return player.status();
             }
-            if(enemy.Health <=0){
+            if(enemy.Health <= 0){
             playArea();
             uiStats();
             ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
             player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level + enemy.Gold)
-            setTimeout(() => {playArea();uiStats();},1000)
+            setTimeout(() => {
+                playArea();
+                uiStats();
+                },1000)
             }
             else{
             setTimeout(() => {
@@ -58,33 +61,42 @@ const game = () =>{
                     uiStats();
                     ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
                     enemy.Health -= player.Strength;
+                    if(enemy.Health <= 0){
+                        gameActions.startFight();
+                    }
                     setTimeout(() => {
-                        if(enemy.Health > 0 && player.Health > 0){
                         turnOrder ='enemy'
                         playArea();
                         uiStats();
                         ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                         player.Health -= enemy.Strength;
-                        setTimeout(() => {gameActions.startFight()}, 1000);
-                    }
-                    else player.status()
-                },1000)
+                        setTimeout(() => {
+                            gameActions.startFight()
+                        }, 1000);
+                    },1000)
                 }
                 else if (player.Agility < enemy.Agility){
                     turnOrder = 'enemy';
-                    playArea();
-                    uiStats();
-                    ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
-                    player.Health -= enemy.Strength;
-                    setTimeout(() => {
-                        if(turnOrder == 'enemy'){
-                            turnOrder = 'player';
+                    if(turnOrder == 'enemy'){
+                        playArea();
+                        uiStats();
+                        console.log('player should be retaliating')
+                        turnOrder = 'player';
+                        enemy.Health -= player.Strength;
+                        if(enemy.Health <= 0){
+                            gameActions.startFight();
+                        }
+                        ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+                        setTimeout(() => {
                             playArea();
                             uiStats();
-                            ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
-                            enemy.Health -= player.Strength;
-                        }
-                        gameActions.startFight()}, 1000);
+                            ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
+                            player.Health -= enemy.Strength;
+                            setTimeout(() => {
+                                gameActions.startFight()
+                                }, 1000);
+                        }, 1000)
+                    }
                     }   
                 },1000)
             }
@@ -163,9 +175,19 @@ class Enemy extends Character {
         this.Gold = 5 + this.Level;
     }
     Orc(){
+        this.Strength = 5 + this.Level;
+        this.Mana = -3 + this.Level;
+        this.Health = 15 + this.Level;
+        this.Agility = 1 + this.Level;
+        this.Gold = 10 + this.Level;
 
     }
     Bandit(){
+        this.Strength = 3 + this.Level;
+        this.Mana = -1 + this.Level;
+        this.Health = 3 + this.Level;
+        this.Agility = 5 + this.Level;
+        this.Gold = 20 + this.Level;
 
     }
 }
@@ -250,7 +272,7 @@ const assignDecision = {
         playArea();
         uiStats();
         if(eventType == 'Fight'){
-            gameActions.getEnemy('Goblin')
+            gameActions.getEnemy(gameActions.getRandom(['Goblin', 'Orc', 'Bandit']))
             gameActions.startFight();
         }
         if(eventType !== 'midFight'){
