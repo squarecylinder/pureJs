@@ -8,6 +8,7 @@ let classPicked = false;
 let eventTriggered = false;
 let eventType;
 let player;
+let enemy;
 let qtrw = GW / 4;
 let qtrh = GH / 4;
 let classPicks = [];
@@ -29,9 +30,64 @@ const game = () =>{
             uiStats();
         },
         getEnemy: (type) => {
-            enemy = new Enemy(type);
+            enemy = new Enemy(type, type);
             enemy[type]();
-            
+        },
+        startFight: () => {
+            playArea();
+            uiStats();
+            if(eventType !== 'midFight'){
+                ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
+                eventType = 'midFight';
+            }
+            if(player.Health <= 0) {
+                return player.status();
+            }
+            if(enemy.Health <=0){
+            playArea();
+            uiStats();
+            ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
+            player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level + enemy.Gold)
+            setTimeout(() => {playArea();uiStats();},1000)
+            }
+            else{
+            setTimeout(() => {
+                if (player.Agility >= enemy.Agility){
+                    turnOrder = 'player'
+                    playArea();
+                    uiStats();
+                    ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+                    enemy.Health -= player.Strength;
+                    setTimeout(() => {
+                        if(enemy.Health > 0 && player.Health > 0){
+                        turnOrder ='enemy'
+                        playArea();
+                        uiStats();
+                        ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
+                        player.Health -= enemy.Strength;
+                        setTimeout(() => {gameActions.startFight()}, 1000);
+                    }
+                    else player.status()
+                },1000)
+                }
+                else if (player.Agility < enemy.Agility){
+                    turnOrder = 'enemy';
+                    playArea();
+                    uiStats();
+                    ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
+                    player.Health -= enemy.Strength;
+                    setTimeout(() => {
+                        if(turnOrder == 'enemy'){
+                            turnOrder = 'player';
+                            playArea();
+                            uiStats();
+                            ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+                            enemy.Health -= player.Strength;
+                        }
+                        gameActions.startFight()}, 1000);
+                    }   
+                },1000)
+            }
         }
     }
 }
@@ -97,13 +153,14 @@ class Player extends Character {
 class Enemy extends Character {
     constructor(Name, Build) {
         super(Name, Build)
-        this.Level = player.Level + (Math.floor(Math.random() * Player.Level));
+        this.Level = player.Level + (Math.floor(Math.random() * player.Level));
     }
     Goblin(){
-        this.Strength = 2;
-        this.Mana = 0;
-        this.Health = 3;
-        this.Agility = 4;
+        this.Strength = 1 + this.Level;
+        this.Mana = -1 + this.Level;
+        this.Health = 5 + this.Level;
+        this.Agility = 3 + this.Level;
+        this.Gold = 5 + this.Level;
     }
     Orc(){
 
@@ -192,6 +249,11 @@ const assignDecision = {
         proceed = [];
         playArea();
         uiStats();
+        if(eventType == 'Fight'){
+            gameActions.getEnemy('Goblin')
+            gameActions.startFight();
+        }
+        if(eventType !== 'midFight'){
         ctx.fillText(eventsDialog.Text ,10, 30)
         player.Gold += eventsDialog.Gold;
         player.Health += eventsDialog.Health;
@@ -200,7 +262,7 @@ const assignDecision = {
         player.XP += eventsDialog.XP;
         if(player.Gold <= 0){
             player.Gold = 0;
-        }
+        }}
         setTimeout(() =>{
         eventTriggered = false;
         playArea();
@@ -209,6 +271,8 @@ const assignDecision = {
     },
     No: () => {
         proceed = [];
+        playArea();
+        uiStats();
         setTimeout(() =>{
         eventTriggered = false;
         }, 100);}
@@ -362,7 +426,9 @@ const uiStats = () => {
     }
 }
 const playerInputName = () => {
-    inputName = prompt('Enter your name').trim();
+    inputName = prompt('Enter your name')
+    if(!inputName) playerInputName()
+    inputName = inputName.trim();
     if(inputName.length <= 0 || inputName.length >= 15){
         alert('Enter a name greater than 0 but less than 15 characters!')
         playerInputName()
