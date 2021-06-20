@@ -427,7 +427,10 @@ const uiStats = () => {
 }
 const playerInputName = () => {
     inputName = prompt('Enter your name')
-    if(!inputName) playerInputName()
+    if(!inputName) {
+        classPicked = false
+        uiClassChoice()
+    }
     inputName = inputName.trim();
     if(inputName.length <= 0 || inputName.length >= 15){
         alert('Enter a name greater than 0 but less than 15 characters!')
