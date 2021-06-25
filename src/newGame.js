@@ -243,25 +243,21 @@ const assignEvents = {
     Explore: () => {
         eventTriggered = true
         eventType = 'Explore'
-        clearInterval(interval)
         ctx.fillText('You find a tunnel. Do you want to look inside?', 10, 30);
     },
     Talk: () => {
         eventTriggered = true
         eventType = 'Talk'
-        clearInterval(interval)
         ctx.fillText('Hey you there! Want to talk?', 10, 30);
     },
     Fight: () => {
         eventTriggered = true
         eventType = 'Fight'
-        clearInterval(interval)
         ctx.fillText('Someone mean mugged you, fight?', 10, 30);
     },
     Rest: () => {
         eventTriggered = true
         eventType = 'Rest'
-        clearInterval(interval)
         ctx.fillText('Thats a nice hay bed there... Sleep?', 10, 30);
     }
 }
