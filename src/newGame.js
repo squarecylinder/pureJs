@@ -9,6 +9,7 @@ let eventTriggered = false;
 let eventType;
 let player;
 let enemy;
+let turnOrder;
 let qtrw = GW / 4;
 let qtrh = GH / 4;
 let classPicks = [];
@@ -34,32 +35,33 @@ const game = () =>{
             enemy[type]();
         },
         startFight: () => {
+            // Need to make this interactive not just a loop that shows the fight
             playArea();
-            uiStats();
+            // uiStats();
             if(eventType !== 'midFight'){
                 ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
-                eventType = 'midFight';
+                eventType = 'midFight';;
             }
             if(player.Health <= 0) {
                 return player.status();
             }
             if(enemy.Health <= 0){
             playArea();
-            uiStats();
+            // uiStats();
             ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
             player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level + enemy.Gold)
             setTimeout(() => {
                 playArea();
-                uiStats();
+                // uiStats();
                 },1000)
             }
             else{
-            setTimeout(() => {
                 if (player.Agility >= enemy.Agility){
                     turnOrder = 'player'
                     playArea();
-                    uiStats();
+                    // uiStats();
                     ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+                    console.log('player should be retaliating PA>=EA')
                     enemy.Health -= player.Strength;
                     if(enemy.Health <= 0){
                         gameActions.startFight();
@@ -67,7 +69,7 @@ const game = () =>{
                     setTimeout(() => {
                         turnOrder ='enemy'
                         playArea();
-                        uiStats();
+                        // uiStats();
                         ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                         player.Health -= enemy.Strength;
                         setTimeout(() => {
@@ -79,8 +81,8 @@ const game = () =>{
                     turnOrder = 'enemy';
                     if(turnOrder == 'enemy'){
                         playArea();
-                        uiStats();
-                        console.log('player should be retaliating')
+                        // uiStats();
+                        console.log('player should be retaliating PA<EA')
                         turnOrder = 'player';
                         enemy.Health -= player.Strength;
                         if(enemy.Health <= 0){
@@ -89,7 +91,7 @@ const game = () =>{
                         ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
                         setTimeout(() => {
                             playArea();
-                            uiStats();
+                            // uiStats();
                             ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                             player.Health -= enemy.Strength;
                             setTimeout(() => {
@@ -97,8 +99,7 @@ const game = () =>{
                                 }, 1000);
                         }, 1000)
                     }
-                    }   
-                },1000)
+                }  
             }
         }
     }
@@ -263,15 +264,15 @@ const assignEvents = {
 }
 const assignDecision = {
     Yes: () => {
-        let eventsDialog = gameActions.getRandom(Events[eventType])
         proceed = [];
         playArea();
-        uiStats();
+        // uiStats();
         if(eventType == 'Fight'){
             gameActions.getEnemy(gameActions.getRandom(['Goblin', 'Orc', 'Bandit']))
             gameActions.startFight();
         }
         if(eventType !== 'midFight'){
+        let eventsDialog = gameActions.getRandom(Events[eventType])
         ctx.fillText(eventsDialog.Text ,10, 30)
         player.Gold += eventsDialog.Gold;
         player.Health += eventsDialog.Health;
@@ -284,13 +285,13 @@ const assignDecision = {
         setTimeout(() =>{
         eventTriggered = false;
         playArea();
-        uiStats();
+        // uiStats();
         }, 3000);
     },
     No: () => {
         proceed = [];
         playArea();
-        uiStats();
+        // uiStats();
         setTimeout(() =>{
         eventTriggered = false;
         }, 100);}
@@ -370,14 +371,7 @@ const Events = {
         XP: -1,
         Text: `You never talked to someone so stupid before... All stats decreased by 1!`
     }],
-    Fight: [{
-        Gold: 0,
-        Health: -100,
-        Mana: 0,
-        Strength: 0,
-        XP: 0,
-        Text: `WE HAVEN'T TAUGHT YOU TO FIGHT?!`
-    }],
+    Fight: [],
     Rest: [{
         Gold: 0,
         Health: 5,
@@ -429,6 +423,7 @@ const playArea = () => {
         ctx.font = '28px sans-serif'
         ctx.fillText(`${choices[i].choice}`, 60 + (qtrw * i), GH - 100)
     }
+    uiStats();
     player.status()
 }
 const uiStats = () => {
