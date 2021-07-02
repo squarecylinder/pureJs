@@ -26,18 +26,18 @@ const game = () =>{
         getPlayer: (Build) => {
             player = new Player(playerInputName(), Build);
             player[Build]();
-            inputBoxes();
+            // inputBoxes();
             playArea();
-            uiStats();
         },
         getEnemy: (type) => {
             enemy = new Enemy(type, type);
             enemy[type]();
         },
+        // TODO: Fight needs to have a ui to continue fighting or leaving
+        // Nice to have: inv or other actions during fight
         startFight: () => {
             // Need to make this interactive not just a loop that shows the fight
             playArea();
-            // uiStats();
             if(eventType !== 'midFight'){
                 ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
                 eventType = 'midFight';
@@ -47,19 +47,16 @@ const game = () =>{
             }
             if(enemy.Health <= 0){
             playArea();
-            // uiStats();
             ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
-            player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level + enemy.Gold)
+            player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level)
             setTimeout(() => {
                 playArea();
-                // uiStats();
                 },1000)
             }
             else{
                 if (player.Agility >= enemy.Agility){
                     turnOrder = 'player'
                     playArea();
-                    // uiStats();
                     ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
                     console.log('player should be retaliating PA>=EA')
                     enemy.Health -= player.Strength;
@@ -69,7 +66,6 @@ const game = () =>{
                     setTimeout(() => {
                         turnOrder ='enemy'
                         playArea();
-                        // uiStats();
                         ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                         player.Health -= enemy.Strength;
                         setTimeout(() => {
@@ -81,7 +77,6 @@ const game = () =>{
                     turnOrder = 'enemy';
                     if(turnOrder == 'enemy'){
                         playArea();
-                        // uiStats();
                         console.log('player should be retaliating PA<EA')
                         turnOrder = 'player';
                         enemy.Health -= player.Strength;
@@ -91,7 +86,6 @@ const game = () =>{
                         ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
                         setTimeout(() => {
                             playArea();
-                            // uiStats();
                             ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                             player.Health -= enemy.Strength;
                             setTimeout(() => {
@@ -101,6 +95,9 @@ const game = () =>{
                     }
                 }  
             }
+        },
+        midFight: () =>{
+            playArea();
         }
     }
 }
@@ -265,12 +262,14 @@ const assignEvents = {
 const assignDecision = {
     Yes: () => {
         proceed = [];
-        playArea();
-        // uiStats();
+        playArea()
         if(eventType == 'Fight'){
             gameActions.getEnemy(gameActions.getRandom(['Goblin', 'Orc', 'Bandit']))
             gameActions.startFight();
         }
+        // if(eventType == 'midFight'){
+        //     gameActions.midFight();
+        // }
         if(eventType !== 'midFight'){
         let eventsDialog = gameActions.getRandom(Events[eventType])
         ctx.fillText(eventsDialog.Text ,10, 30)
@@ -284,17 +283,20 @@ const assignDecision = {
         }}
         setTimeout(() =>{
         eventTriggered = false;
-        playArea();
-        // uiStats();
+        playArea()
         }, 3000);
     },
     No: () => {
         proceed = [];
-        playArea();
-        // uiStats();
+        playArea()
         setTimeout(() =>{
         eventTriggered = false;
         }, 100);}
+}
+const fightDecisions = {
+    Fight: () => {},
+    Run: () => {},
+    Heal: () => {}
 }
 // Checks to see if where user clicks on input boxes
 const clickHandler = (e) => {
@@ -311,7 +313,7 @@ const clickHandler = (e) => {
             if(!eventTriggered){
                 // If an event wasn't triggered fire
                 assignEvents[choices[i].choice]()
-                yesNo();
+                inputCreation(['Yes', 'No'], 'decision', 150, (GH - 300), 200, 50, proceed, 225, (GH - 270), 100)                
             }
         }
     }
@@ -381,32 +383,27 @@ const Events = {
         Text: `You took a nice rest.`
     }]
 }
-const yesNo = () => {
-    const yesorNo = ['Yes', 'No'];
-    for(let i = 0; i < 2; i++){
+const inputCreation = (array, definition, posX, posY, width, height, globalArr, textPosX, textPosY, maxWidth) => {
+    for(let i = 0; i < array.length; i++) {
+        // Creates an instance of Path2D which allows us to see if pointer is in the path of
         let button = new Path2D();
+        // Makes the input boxes gray, we can make this dynamic if we wanted to
         ctx.fillStyle = 'gray';
-        button.decision = yesorNo[i];
-        button.rect(150 + (qtrw * i), GH - 300, 200, 50);
-        proceed.push(button);
+        //What we want to call on the path2D obj, example button {decision: yes}
+        button[definition] = array[i];
+        // Where the input boxes sit on the canvas
+        button.rect(posX + (qtrw * i), posY, width, height);
+        console.log(posX, posY, width, height)
+        // This is how we reference the boxes afterwards, I will probably take this out of global and just return results
+        globalArr.push(button);
+        // rendering the buttons on the canvas
         ctx.fill(button);
+        // This will be the text on the input boxes
         ctx.fillStyle = 'black';
+        // again this could be dynamic
         ctx.font = '28px sans-serif'
-        ctx.fillText(`${yesorNo[i]}`, 225 + (qtrw * i), GH - 270, 100)
+        ctx.fillText(`${array[i]}`, textPosX + (qtrw * i), textPosY, maxWidth)
     }
-}
-//Creates four input boxes
-const inputBoxes = () => {
-    const Choices = ['Explore', 'Talk', 'Fight', 'Rest']
-    ctx.fillStyle = '#A89E60'
-    ctx.rect(0, 0, GW, GH)
-    ctx.fill()
-        for(let i = 0; i < 4; i++){
-        let button = new Path2D();
-        button.choice = Choices[i];
-        button.rect(50 + (qtrw * i), GH - 150 , 125, 100);
-        choices.push(button)
-        }
 }
 // our play area
 const playArea = () => {
@@ -416,13 +413,7 @@ const playArea = () => {
     ctx.strokeStyle = '#58E8A2'
     ctx.rect(0, 0, GW / 1.25, GH / 1.45)
     ctx.stroke()
-    for(let i = 0; i < 4; i++){
-        ctx.fillStyle = 'gray';
-        ctx.fill(choices[i]);
-        ctx.fillStyle = 'black';
-        ctx.font = '28px sans-serif'
-        ctx.fillText(`${choices[i].choice}`, 60 + (qtrw * i), GH - 100)
-    }
+    inputCreation(['Explore', 'Talk', 'Fight', 'Rest'],'choice', 50, (GH - 150), 125, 100, choices, 60, (GH - 100))
     uiStats();
     player.status()
 }
