@@ -40,7 +40,7 @@ const game = () =>{
             // uiStats();
             if(eventType !== 'midFight'){
                 ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
-                eventType = 'midFight';;
+                eventType = 'midFight';
             }
             if(player.Health <= 0) {
                 return player.status();
