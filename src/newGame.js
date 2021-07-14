@@ -15,6 +15,7 @@ let qtrh = GH / 4;
 let classPicks = [];
 let choices = [];
 let proceed = [];
+let fightOptions = [];
 let interval;
 // our game actions module
 const game = () =>{
@@ -69,7 +70,8 @@ const game = () =>{
                         ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                         player.Health -= enemy.Strength;
                         setTimeout(() => {
-                            gameActions.startFight()
+                            gameActions.midFight()
+                            // gameActions.startFight()
                         }, 1000);
                     },1000)
                 }
@@ -81,7 +83,8 @@ const game = () =>{
                         turnOrder = 'player';
                         enemy.Health -= player.Strength;
                         if(enemy.Health <= 0){
-                            gameActions.startFight();
+                            gameActions.midFight()
+                            // gameActions.startFight();
                         }
                         ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
                         setTimeout(() => {
@@ -89,7 +92,8 @@ const game = () =>{
                             ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
                             player.Health -= enemy.Strength;
                             setTimeout(() => {
-                                gameActions.startFight()
+                                gameActions.midFight()
+                                // gameActions.startFight()
                                 }, 1000);
                         }, 1000)
                     }
@@ -98,6 +102,7 @@ const game = () =>{
         },
         midFight: () =>{
             playArea();
+            inputCreation(['Fight', 'Run', 'Heal'], 'decision', 95, (GH - 300), 150, 50, fightOptions, 135, (GH - 270), 100)
         }
     }
 }
@@ -320,6 +325,11 @@ const clickHandler = (e) => {
     for (let i = 0; i < proceed.length; i++){
         if(ctx.isPointInPath(proceed[i], e.offsetX, e.offsetY)){
             assignDecision[proceed[i].decision]()
+        }
+    }
+    for (let i = 0; i < fightOptions.length; i++){
+        if(ctx.isPointInPath(fightOptions[i], e.offsetX, e.offsetY)){
+            console.log((fightOptions[i].decision))
         }
     }
 }
