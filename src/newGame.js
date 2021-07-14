@@ -16,7 +16,6 @@ let classPicks = [];
 let choices = [];
 let proceed = [];
 let fightOptions = [];
-let interval;
 // our game actions module
 const game = () =>{
     return {
@@ -143,7 +142,6 @@ class Player extends Character {
             ctx.fillStyle = 'white';
             ctx.font = '50px serif';
             ctx.fillText('You have died...', GW / 2 - 150, GH / 2, 300)
-            clearInterval(interval)
         }
         if (this.XP >= 100){
             this.Health++;
@@ -233,21 +231,25 @@ const assignBuild = {
 }
 const assignEvents = {
     Explore: () => {
+        playArea();
         eventTriggered = true
         eventType = 'Explore'
         ctx.fillText('You find a tunnel. Do you want to look inside?', 10, 30);
     },
     Talk: () => {
+        playArea();
         eventTriggered = true
         eventType = 'Talk'
         ctx.fillText('Hey you there! Want to talk?', 10, 30);
     },
     Fight: () => {
+        playArea();
         eventTriggered = true
         eventType = 'Fight'
         ctx.fillText('Someone mean mugged you, fight?', 10, 30);
     },
     Rest: () => {
+        playArea();
         eventTriggered = true
         eventType = 'Rest'
         ctx.fillText('Thats a nice hay bed there... Sleep?', 10, 30);
@@ -292,23 +294,38 @@ const fightDecisions = {
             enemy.Health -= player.Strength;
             ctx.fillText(`${enemy.Build}'s Health: ${enemy.Health}`, 10, 60);
             playerTurn = !playerTurn;
+            gameActions.midFight();
         }
         else{
             player.Health -= enemy.Strength;
             playArea();
             ctx.fillText(`${enemy.Build} attacks you for ${enemy.Strength}`, 10, 30);
-            uiStats();
             playerTurn = !playerTurn
+            gameActions.midFight();
         }
-        gameActions.midFight();
+        if(enemy.Health <= 0){
+            fightOptions = [];
+            playArea();
+            ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
+            player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level)
+            eventTriggered = false;
+        }
     },
     Run: () => {
+        fightOptions = [];
         playArea();
         ctx.fillText('You run away!', 10, 30)
         eventTriggered = false;
-        console.log('Run')
     },
-    Heal: () => {console.log('Heal')}
+    Heal: () => {
+        fightOptions = [];
+        let heal = Math.ceil(Math.random() * 5);
+        player.Health += heal;
+        playArea();
+        playerTurn = false;
+        ctx.fillText(`You have healed for ${heal}`,10, 30);
+        gameActions.midFight();
+    }
 }
 // Checks to see if where user clicks on input boxes
 const clickHandler = (e) => {
