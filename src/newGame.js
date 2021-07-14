@@ -40,65 +40,53 @@ const game = () =>{
             // Need to make this interactive not just a loop that shows the fight
             playArea();
             if(eventType !== 'midFight'){
+                console.log('entered the start fight')
                 ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
                 eventType = 'midFight';
             }
             if(player.Health <= 0) {
                 return player.status();
             }
-            if(enemy.Health <= 0){
-            playArea();
-            ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
-            player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level)
-            setTimeout(() => {
-                playArea();
-                },1000)
-            }
-            else{
-                if (player.Agility >= enemy.Agility){
-                    turnOrder = 'player'
-                    playArea();
-                    ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
-                    console.log('player should be retaliating PA>=EA')
-                    enemy.Health -= player.Strength;
-                    if(enemy.Health <= 0){
-                        gameActions.startFight();
-                    }
-                    setTimeout(() => {
-                        turnOrder ='enemy'
-                        playArea();
-                        ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
-                        player.Health -= enemy.Strength;
-                        setTimeout(() => {
-                            gameActions.midFight()
-                            // gameActions.startFight()
-                        }, 1000);
-                    },1000)
-                }
-                else if (player.Agility < enemy.Agility){
-                    turnOrder = 'enemy';
-                    if(turnOrder == 'enemy'){
-                        playArea();
-                        console.log('player should be retaliating PA<EA')
-                        turnOrder = 'player';
-                        enemy.Health -= player.Strength;
-                        if(enemy.Health <= 0){
-                            gameActions.midFight()
-                            // gameActions.startFight();
-                        }
-                        ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
-                        setTimeout(() => {
-                            playArea();
-                            ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
-                            player.Health -= enemy.Strength;
-                            setTimeout(() => {
-                                gameActions.midFight()
-                                // gameActions.startFight()
-                                }, 1000);
-                        }, 1000)
-                    }
-                }  
-            }
+            // if(enemy.Health <= 0){
+            // // playArea();
+            // ctx.fillText(`You have defeated the ${enemy.Build}!`, 10, 30)
+            // player.XP += (enemy.Strength + enemy.Agility + enemy.Mana + enemy.Health + enemy.Level)
+            // }
+            // else{
+            //     if (player.Agility >= enemy.Agility){
+            //         turnOrder = 'player'
+            //         // playArea();
+            //         ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+            //         console.log('player should be retaliating PA>=EA')
+            //         enemy.Health -= player.Strength;
+            //         if(enemy.Health <= 0){
+            //             // gameActions.startFight();
+            //             gameActions.midFight();
+            //         }
+            //         turnOrder ='enemy'
+            //         // playArea();
+            //         ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
+            //         player.Health -= enemy.Strength;
+            //             gameActions.midFight();
+            //     }
+            //     else if (player.Agility < enemy.Agility){
+            //         turnOrder = 'enemy';
+            //         if(turnOrder == 'enemy'){
+            //             // playArea();
+            //             console.log('player should be retaliating PA<EA')
+            //             turnOrder = 'player';
+            //             enemy.Health -= player.Strength;
+            //             if(enemy.Health <= 0){
+            //                 gameActions.midFight();
+            //             }
+            //             ctx.fillText(`You attacked dealing ${player.Strength} damage!`, 10, 30)
+            //                 // playArea();
+            //                 ctx.fillText(`The ${enemy.Build} attacked for ${enemy.Strength}!`, 10, 30)
+            //                 player.Health -= enemy.Strength;
+            //                     gameActions.midFight();
+            //         }
+            //     }  
+            // }
         },
         midFight: () =>{
             playArea();
@@ -286,10 +274,9 @@ const assignDecision = {
         if(player.Gold <= 0){
             player.Gold = 0;
         }}
-        setTimeout(() =>{
+        console.log('player should press something else')
+        eventType = '';
         eventTriggered = false;
-        playArea()
-        }, 3000);
     },
     No: () => {
         proceed = [];
