@@ -9,7 +9,7 @@ let eventTriggered = false;
 let eventType;
 let player;
 let enemy;
-let turnOrder;
+let playerTurn;
 let qtrw = GW / 4;
 let qtrh = GH / 4;
 let classPicks = [];
@@ -40,9 +40,11 @@ const game = () =>{
             // Need to make this interactive not just a loop that shows the fight
             playArea();
             if(eventType !== 'midFight'){
+                (player.Agility >= enemy.Agility ? playerTurn = true : playerTurn = false)
                 console.log('entered the start fight')
                 ctx.fillText(`You have encountered a ${enemy.Build}!`, 10, 30)
                 eventType = 'midFight';
+                gameActions.midFight()
             }
             if(player.Health <= 0) {
                 return player.status();
@@ -89,7 +91,6 @@ const game = () =>{
             // }
         },
         midFight: () =>{
-            playArea();
             inputCreation(['Fight', 'Run', 'Heal'], 'decision', 95, (GH - 300), 150, 50, fightOptions, 135, (GH - 270), 100)
         }
     }
@@ -260,9 +261,6 @@ const assignDecision = {
             gameActions.getEnemy(gameActions.getRandom(['Goblin', 'Orc', 'Bandit']))
             gameActions.startFight();
         }
-        // if(eventType == 'midFight'){
-        //     gameActions.midFight();
-        // }
         if(eventType !== 'midFight'){
         let eventsDialog = gameActions.getRandom(Events[eventType])
         ctx.fillText(eventsDialog.Text ,10, 30)
@@ -271,12 +269,11 @@ const assignDecision = {
         player.Mana += eventsDialog.Mana;
         player.Strength += eventsDialog.Strength;
         player.XP += eventsDialog.XP;
+        eventTriggered = false;
         if(player.Gold <= 0){
             player.Gold = 0;
-        }}
-        console.log('player should press something else')
-        eventType = '';
-        eventTriggered = false;
+            }
+        }
     },
     No: () => {
         proceed = [];
@@ -286,9 +283,32 @@ const assignDecision = {
         }, 100);}
 }
 const fightDecisions = {
-    Fight: () => {},
-    Run: () => {},
-    Heal: () => {}
+    Fight: () => {
+        fightOptions = [];
+        console.log(`Player attacks first ${playerTurn}`) 
+        if(playerTurn){
+            playArea();
+            ctx.fillText(`You have attacked the ${enemy.Build} for ${player.Strength}`, 10, 30);
+            enemy.Health -= player.Strength;
+            ctx.fillText(`${enemy.Build}'s Health: ${enemy.Health}`, 10, 60);
+            playerTurn = !playerTurn;
+        }
+        else{
+            player.Health -= enemy.Strength;
+            playArea();
+            ctx.fillText(`${enemy.Build} attacks you for ${enemy.Strength}`, 10, 30);
+            uiStats();
+            playerTurn = !playerTurn
+        }
+        gameActions.midFight();
+    },
+    Run: () => {
+        playArea();
+        ctx.fillText('You run away!', 10, 30)
+        eventTriggered = false;
+        console.log('Run')
+    },
+    Heal: () => {console.log('Heal')}
 }
 // Checks to see if where user clicks on input boxes
 const clickHandler = (e) => {
@@ -316,7 +336,10 @@ const clickHandler = (e) => {
     }
     for (let i = 0; i < fightOptions.length; i++){
         if(ctx.isPointInPath(fightOptions[i], e.offsetX, e.offsetY)){
-            console.log((fightOptions[i].decision))
+            console.log(eventType)
+            if(eventType == 'midFight'){
+            fightDecisions[fightOptions[i].decision]()
+            }
         }
     }
 }
@@ -390,7 +413,6 @@ const inputCreation = (array, definition, posX, posY, width, height, globalArr, 
         button[definition] = array[i];
         // Where the input boxes sit on the canvas
         button.rect(posX + (qtrw * i), posY, width, height);
-        console.log(posX, posY, width, height)
         // This is how we reference the boxes afterwards, I will probably take this out of global and just return results
         globalArr.push(button);
         // rendering the buttons on the canvas
