@@ -1,19 +1,19 @@
-let ctx = document.getElementById("gameScreen").getContext('2d')
+let ctx1 = document.getElementById("gameScreen").getContext('2d')
 //Canvas width and height
-const GW = 960;
-const GH = 540;
+const GW1 = canvas.width;
+const GH1 = canvas.height;
 // state of key press
-const index= 15;
 let rightPressed = false;
 let leftPressed = false;
 let score = 0;
+let killGame = false;
 // Defines the angle of the balls starting pos
 // Ball class
 class Ball {
     constructor(){
         // where the ball spawns on the screen
-        this.ballX = GW / 2;
-        this.ballY = GH - 100;
+        this.ballX = GW1 / 2;
+        this.ballY = GH1 - 100;
         // size of the ball
         this.radius = 8;
         // angle and speed at which the ball moves once spawned
@@ -23,19 +23,19 @@ class Ball {
         this.hitbox = false;
     }
     // How we draw a ball shape
-    draw(ctx){
-        ctx.beginPath();
-        ctx.arc(this.ballX, this.ballY, this.radius, 0, Math.PI * 2)
-        ctx.fillStyle = 'red';
-        ctx.fill();
-        ctx.closePath();
+    draw(ctx1){
+        ctx1.beginPath();
+        ctx1.arc(this.ballX, this.ballY, this.radius, 0, Math.PI * 2)
+        ctx1.fillStyle = 'red';
+        ctx1.fill();
+        ctx1.closePath();
     }
-    update(ctx){
+    update(ctx1){
         if(this.hitbox){
-            ctx.strokeStyle = "blue";
-            ctx.beginPath();
-            ctx.arc(this.ballX+1, this.ballY+1, this.radius, 0, 2 * Math.PI, false)
-            ctx.stroke()
+            ctx1.strokeStyle = "blue";
+            ctx1.beginPath();
+            ctx1.arc(this.ballX+1, this.ballY+1, this.radius, 0, 2 * Math.PI, false)
+            ctx1.stroke()
         }
         // Changes direction of ball
         this.ballX += Math.cos(this.direction)  * this.speed
@@ -44,8 +44,8 @@ class Ball {
             // this.ballX = this.radius;
             this.direction = Math.atan2(Math.sin(this.direction), -Math.cos(this.direction))
         }
-        if(this.ballX + this.radius > GW){
-            // this.ballX = GW - this.radius;
+        if(this.ballX + this.radius > GW1){
+            // this.ballX = GW1 - this.radius;
             this.direction = Math.atan2(Math.sin(this.direction), -Math.cos(this.direction))
         }
         if(this.ballY - this.radius < 0){
@@ -53,7 +53,7 @@ class Ball {
             this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction))
         }
         // Ball & Paddle Collision
-        if((this.ballY > GH - paddle.height - this.radius && this.ballX > paddle.position.x && this.ballX < paddle.position.x + paddle.width)){
+        if((this.ballY > GH1 - paddle.height - this.radius && this.ballX > paddle.position.x && this.ballX < paddle.position.x + paddle.width)){
             let difference = Math.floor(this.ballX) - paddle.position.x
             let percentage = (difference / paddle.width).toFixed(2)
             switch(true){
@@ -73,13 +73,13 @@ class Ball {
             // this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
         }
         // If we touch the bottom of the screen, reload page.
-        else if(this.ballY + this.direction > GH){
+        else if(this.ballY + this.direction > GH1){
             location.reload()
         }
         // Ball & Brick collision
         for(let i = 0 ; i < bricks.length; i++){
             if(this.ballY > bricks[i].position.y && this.ballY < bricks[i].position.y + bricks[i].height && this.ballX > bricks[i].position.x && this.ballX < bricks[i].position.x + bricks[i].width){
-                bricks[i].break(ctx);
+                bricks[i].break(ctx1);
                 bricks.splice(i, 1);
                 this.direction = Math.atan2(-Math.sin(this.direction), Math.cos(this.direction));
                 score++
@@ -97,36 +97,36 @@ class Paddle {
         this.width = 150;
         this.height = 20;
         this.position = {
-            x: (GW - this.width) / 2,
-            y: GH - this.height - 10
+            x: (GW1 - this.width) / 2,
+            y: GH1 - this.height - 10
         }
         this.hitbox = false;
     }
     // Drawing a paddle
-    draw(ctx){
-        ctx.beginPath();
-        ctx.rect(this.position.x, this.position.y, this.width, this.height)
-        ctx.fillStyle = '#7fcab4';
-        ctx.fill()
-        ctx.closePath()
+    draw(ctx1){
+        ctx1.beginPath();
+        ctx1.rect(this.position.x, this.position.y, this.width, this.height)
+        ctx1.fillStyle = '#7fcab4';
+        ctx1.fill()
+        ctx1.closePath()
     }
     // Updates left or right based on input
     update(lp, rp){
         if(this.hitbox){
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.rect(this.position.x, this.position.y - 10, 0, 20);
-            ctx.stroke()
-            ctx.beginPath();
-            ctx.strokeStyle = 'red';
-            ctx.rect(this.position.x + 66, this.position.y, 20, this.height);
-            ctx.stroke()
-            ctx.beginPath();
-            ctx.strokeStyle = 'black';
-            ctx.rect(this.position.x + this.width, this.position.y - 10, 0, this.height);
-            ctx.stroke()
+            ctx1.beginPath();
+            ctx1.strokeStyle = 'black';
+            ctx1.rect(this.position.x, this.position.y - 10, 0, 20);
+            ctx1.stroke()
+            ctx1.beginPath();
+            ctx1.strokeStyle = 'red';
+            ctx1.rect(this.position.x + 66, this.position.y, 20, this.height);
+            ctx1.stroke()
+            ctx1.beginPath();
+            ctx1.strokeStyle = 'black';
+            ctx1.rect(this.position.x + this.width, this.position.y - 10, 0, this.height);
+            ctx1.stroke()
         }
-    if(rp && (this.position.x + this.width) < GW ){
+    if(rp && (this.position.x + this.width) < GW1 ){
         this.position.x += 10;
         rp = false
         }
@@ -138,7 +138,7 @@ class Paddle {
 }
 class Brick {
     constructor(posX, posY){
-        this.width = GW / 10;
+        this.width = GW1 / 10;
         this.height = 30;
         this.position = {
             x: 100 + (posX * 150 - (this.width / 10)),
@@ -146,8 +146,8 @@ class Brick {
         }
         this.destroyed = false
     }
-    break(ctx){
-        ctx.clearRect(this.width, this.height, this.position.x, this.position.y)
+    break(ctx1){
+        ctx1.clearRect(this.width, this.height, this.position.x, this.position.y)
         this.destroyed = true
     }
 }
@@ -186,12 +186,12 @@ const stopMovement = (e) => {
     }
 }
 const touchHandler = (e) => {
-    if(e.touches[0].pageX < GW / 2){
+    if(e.touches[0].pageX < GW1 / 2){
         e.preventDefault()
         leftPressed = true;
         console.log(e.touches[0])
     }
-    if(e.touches[0].pageX > GW / 2){
+    if(e.touches[0].pageX > GW1 / 2){
         e.preventDefault()
         rightPressed = true
         console.log(e.touches[0])
@@ -204,16 +204,16 @@ const touchHandleStop = (e) => {
 }
 // UI Elements
 const uiScore = () => {
-    ctx.font = '18px sans-serif';
-    ctx.fillText(`Score: ${score}`, 0, 15);
+    ctx1.font = '18px sans-serif';
+    ctx1.fillText(`Score: ${score}`, 0, 15);
 }
 const uiSpeed = () => {
-    ctx.font = '18px serif';
-    ctx.fillText(`Speed: ${ball.speed}`, 100, 15)
+    ctx1.font = '18px serif';
+    ctx1.fillText(`Speed: ${ball.speed}`, 100, 15)
 }
 const uiWin = () => {
-    ctx.font = '48px sans-serif';
-    ctx.fillText('You won!', GW / 2, GH / 2)
+    ctx1.font = '48px sans-serif';
+    ctx1.fillText('You won!', GW1 / 2, GH1 / 2)
 }
 // toggle hitboxes on click
 const uiDev = () => {
@@ -223,25 +223,27 @@ const uiDev = () => {
 }
 // The loop
 const gameLoop = () => {
-    ctx.clearRect(0, 0, GW, GH);
+    ctx1.clearRect(0, 0, GW1, GH1);
     uiScore();
     uiSpeed();
     for(let i = 0; i < bricks.length; i++){
         if(!bricks[i].destroyed){
-        ctx.beginPath();
-        ctx.rect(bricks[i].position.x, bricks[i].position.y, bricks[i].width, bricks[i].height)
-        ctx.fillStyle = '#7fcab4';
-        ctx.fill()
-        ctx.closePath()}
+        ctx1.beginPath();
+        ctx1.rect(bricks[i].position.x, bricks[i].position.y, bricks[i].width, bricks[i].height)
+        ctx1.fillStyle = '#7fcab4';
+        ctx1.fill()
+        ctx1.closePath()}
     }
     // changes the ball movement
-    ball.update(ctx);
-    ball.draw(ctx);
+    ball.update(ctx1);
+    ball.draw(ctx1);
     //draws the ball
-    paddle.draw(ctx);
+    paddle.draw(ctx1);
     paddle.update(leftPressed, rightPressed);
     // Calls the loop again
-    requestAnimationFrame(gameLoop);
+    if(!killGame){
+        requestAnimationFrame(gameLoop);
+    }
 }
 // Event handlers outside of the loop to stop performance bogs
 document.addEventListener("keydown", startMovement);
@@ -252,4 +254,4 @@ document.addEventListener("touchend", touchHandleStop);
 // document.addEventListener("click", uiDev);
 // setTimeout(gameLoop, 1000 / 60)
 // Requests the loop every frame
-requestAnimationFrame(gameLoop);
+// requestAnimationFrame(gameLoop);

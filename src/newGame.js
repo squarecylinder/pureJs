@@ -143,6 +143,8 @@ class Enemy extends Character {
 }
 // Creates 4 boxes each representing a class
 const uiClassChoice = () => {
+    ctx.clearRect(0, 0, GW, GH)
+    classPicked = false
     // our selection arrays
     const Builds = ['Warrior', 'Rogue', 'Mage', 'Hunter']
     const colors = ['red', 'green', 'blue', 'magenta']
@@ -440,4 +442,4 @@ const playerInputName = () => {
     return inputName
 }
 canvas.addEventListener("click", clickHandler)
-uiClassChoice()
+// uiClassChoice()

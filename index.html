@@ -5,8 +5,15 @@
         <link rel="stylesheet" href="src/style.css">
     </head>
     <body>
-            <canvas id="gameScreen" width=950 height=700></canvas>
-            <script src="src/newGame.js"></script>
-            <!-- <script src="src/index.js"></script> -->
+    <marquee>
+        You will have to refresh the screen to reset Brick Breaker. You may have to double click RPG to get it started! ©Jalen Straka - 1997
+    </marquee>
+        <hr>
+        <section id=btns>
+            <button onclick="killGame = false, gameLoop()">Paddle Game</button>  <button onclick="killGame = true, uiClassChoice()">RPG Game</button>
+        </section>
+        <canvas id="gameScreen" width=950 height=700></canvas>
+        <script src="src/newGame.js"></script>
+        <script src="src/index.js"></script>
     </body>
 </html>
